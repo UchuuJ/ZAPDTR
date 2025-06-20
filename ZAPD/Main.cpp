@@ -139,7 +139,7 @@ std::atomic<unsigned int> numWorkersLeft = 0;
 
 extern const char gBuildHash[];
 
-extern void ImportExporters();
+//extern void ImportExporters();
 
 extern "C" int zapd_main(int argc, char* argv[])
 {
@@ -562,7 +562,7 @@ void Arg_VerboseUnaccounted([[maybe_unused]] int& i, [[maybe_unused]] char* argv
 
 void Arg_SetExporter(int& i, char* argv[])
 {
-	ImportExporters();
+	//ImportExporters();
 	Globals::Instance->currentExporter = argv[++i];
 }
 
