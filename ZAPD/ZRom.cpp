@@ -7,6 +7,12 @@
 #ifdef __linux__
 #include <byteswap.h>
 #endif
+
+#if defined(__FreeBSD__)
+//Byteswap is in a Different Header on FreeBSD
+#include <sys/endian.h>
+#endif
+
 #include <Globals.h>
 
 namespace fs = std::filesystem;
@@ -75,6 +81,7 @@ namespace fs = std::filesystem;
 
 bool ZRom::IsMQ() {
     int crc = BitConverter::ToInt32BE(romData, 0x10);
+
     switch (crc) {
         case OOT_NTSC_10:
         case OOT_NTSC_11:

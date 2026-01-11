@@ -296,6 +296,11 @@ int ExtractFunc(int workerID, int fileListSize, std::string fileListItem, ZFileM
 	return 0;
 }
 
+void ImportExporters()
+{
+  printf("Huh");
+}
+
 bool Parse(const fs::path& xmlFilePath, const fs::path& basePath, const fs::path& outPath,
            ZFileMode fileMode, int workerID)
 {
@@ -562,7 +567,7 @@ void Arg_VerboseUnaccounted([[maybe_unused]] int& i, [[maybe_unused]] char* argv
 
 void Arg_SetExporter(int& i, char* argv[])
 {
-	ImportExporters();
+        ImportExporters();
 	Globals::Instance->currentExporter = argv[++i];
 }
 

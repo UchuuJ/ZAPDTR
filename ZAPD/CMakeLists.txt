@@ -426,6 +426,11 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU|Clang|AppleClang")
         target_link_options(${PROJECT_NAME} PUBLIC
             -pthread
         )
+    elseif(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+	target_link_options(${PROJECT_NAME} PUBLIC
+            -pthread
+            -lexecinfo
+        )
     else()
         target_link_options(${PROJECT_NAME} PUBLIC
             -pthread

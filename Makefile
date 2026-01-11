@@ -27,8 +27,8 @@ else
   CXX := g++
 endif
 
-INC := -I ZAPD -I lib/libgfxd -I lib/tinyxml2 -I ZAPDUtils
-CXXFLAGS := -fpic -std=c++17 -Wall -Wextra -fno-omit-frame-pointer
+INC := -I ZAPD -I lib/libgfxd -I lib/tinyxml2
+CXXFLAGS := -fpic -std=c++17 -Wall -Wno-c++11-narrowing  -Wextra -fno-omit-frame-pointer
 OPTFLAGS :=
 
 ifneq ($(DEBUG),0)
@@ -74,9 +74,16 @@ endif
 
 UNAME := $(shell uname)
 UNAMEM := $(shell uname -m)
+ifeq ($(UNAME), FreeBSD)
+  LDFLAGS += -Wl, -L /usr/local/lib -lexecinfo -pthread
+  INC += -I /usr/local/include
+endif
+
 ifneq ($(UNAME), Darwin)
-  LDFLAGS += -Wl,-export-dynamic -lstdc++fs
-  EXPORTERS := -Wl,--whole-archive ExporterTest/ExporterTest.a -Wl,--no-whole-archive
+  ifneq ($(UNAME), FreeBSD)
+    LDFLAGS += -Wl,-export-dynamic -lstdc++fs
+    EXPORTERS := -Wl,--whole-archive ExporterTest/ExporterTest.a -Wl,--no-whole-archive
+  endif
 else
   EXPORTERS := -Wl,-force_load ExporterTest/ExporterTest.a
   ifeq ($(UNAMEM),arm64)
@@ -117,14 +124,14 @@ copycheck: ZAPD.out
 clean:
 	rm -rf build ZAPD.out
 	$(MAKE) -C lib/libgfxd clean
-	$(MAKE) -C ZAPDUtils clean
+	#$(MAKE) -C ZAPDUtils clean
 	$(MAKE) -C ExporterTest clean
 
 rebuild: clean all
 
 format:
 	clang-format-14 -i $(ZAPD_CPP_FILES) $(ZAPD_H_FILES)
-	$(MAKE) -C ZAPDUtils format
+	#$(MAKE) -C ZAPDUtils format
 	$(MAKE) -C ExporterTest format
 
 .PHONY: all build/ZAPD/BuildInfo.o copycheck clean rebuild format
@@ -141,11 +148,11 @@ lib/libgfxd/libgfxd.a:
 ExporterTest:
 	$(MAKE) -C ExporterTest
 
-.PHONY: ZAPDUtils
-ZAPDUtils:
-	$(MAKE) -C ZAPDUtils
+#.PHONY: ZAPDUtils
+#ZAPDUtils:
+#	$(MAKE) -C ZAPDUtils
 
 
 # Linking
-ZAPD.out: $(O_FILES) lib/libgfxd/libgfxd.a ExporterTest ZAPDUtils
-	$(CXX) $(CXXFLAGS) $(O_FILES) lib/libgfxd/libgfxd.a ZAPDUtils/ZAPDUtils.a $(EXPORTERS) $(LDFLAGS) $(OUTPUT_OPTION)
+ZAPD.out: $(O_FILES) lib/libgfxd/libgfxd.a ExporterTest 
+	$(CXX) $(CXXFLAGS) $(O_FILES) lib/libgfxd/libgfxd.a $(EXPORTERS) $(LDFLAGS) $(OUTPUT_OPTION)
